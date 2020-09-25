@@ -1,0 +1,15 @@
+{
+  "name": "solana-validator-dump",
+  "version": "1.0.0",
+  "description": "",
+  "main": "vdump.js",
+  "dependencies": {
+    "command-line-parser": "^0.1.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
