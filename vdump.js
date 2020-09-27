@@ -48,8 +48,10 @@ You must install the JavaScript dependencies:
 npm install 
 `
 
-const ASN_FIELD_CHAR = 50
-const NODE_FIELD_CHAR = 50
+const ASN_WIDE_FIELD_CHAR = 80
+const ASN_FIELD_CHAR = 48
+const ASNID_FIELD_CHAR = 7
+const NODE_FIELD_CHAR = 48
 const IP_FIELD_CHAR = 20
 
 async function main() {
@@ -132,7 +134,7 @@ async function main() {
 
       ++summary[sumStr] || (summary[sumStr]=1)
 
-      nodesGrouped[response.nodeID] = { nodeIP: response.nodeIP, asn, asnID, bgpPrefix } 
+      nodesGrouped[response.nodeID] = { nodeIP: response.nodeIP, asn, asnID, bgpPrefix, sumStr } 
     }
   }
   
@@ -145,15 +147,15 @@ async function main() {
       console.log("location,nodes_at_location")
       ascSumDo( summary, (asn,count) => { console.log(asn+","+count) } )
     } else {
-      console.log("location".padEnd(ASN_FIELD_CHAR," "),"nodes_at_location")
-      ascSumDo( summary, (asn,count) => { console.log(asn.padEnd(ASN_FIELD_CHAR," ").substr(0,ASN_FIELD_CHAR),count) } )
+      console.log("location".padEnd(ASN_WIDE_FIELD_CHAR," "),"nodes_at_location")
+      ascSumDo( summary, (asn,count) => { console.log(asn.padEnd(ASN_WIDE_FIELD_CHAR," ").substr(0,ASN_WIDE_FIELD_CHAR),count) } )
     }
     console.log()
     process.exit(0)
   }
 
   Object.keys(nodesGrouped).forEach(function (nodeID) { 
-    nodesGrouped[nodeID].count = summary[ nodesGrouped[nodeID].asn ] 
+    nodesGrouped[nodeID].count = summary[ nodesGrouped[nodeID].sumStr ] 
   })
 
   if ( args.max ) {
@@ -165,18 +167,20 @@ async function main() {
   } 
 
   if ( args.csv ) {
-    console.log("nodeID,nodeIP,location,nodes_at_location")
+    console.log("nodeID,nodeIP,BGP_Prefix,asnID,location,nodes_at_location")
     ascItemDo( nodesGrouped, (nodeID,entry) => { 
-      console.log(nodeID+ ","+ entry.nodeIP+ ","+ entry.asn+ ","+ entry.count) 
+      console.log(nodeID+ ","+ entry.nodeIP+ ","+entry.bgpPrefix+","+ entry.asnID+ ","+entry.asn+","+ entry.count) 
     })
   } else {
     if ( args.oi ) {
       ascItemDo( nodesGrouped, (nodeID,_) => { console.log('- '+nodeID) } )
     } else {
-      console.log("nodeID".padEnd(NODE_FIELD_CHAR," "),"nodeIP".padEnd(IP_FIELD_CHAR," "),"location".padEnd(ASN_FIELD_CHAR," "),"nodes_at_location")
+      console.log("nodeID".padEnd(NODE_FIELD_CHAR," "),"nodeIP".padEnd(IP_FIELD_CHAR," "),"BGP_Prefix".padEnd(IP_FIELD_CHAR," "),"asnID".padEnd(ASNID_FIELD_CHAR," "),"location".padEnd(ASN_FIELD_CHAR," "),"nodes_at_location")
       ascItemDo( nodesGrouped, (nodeID,entry) => { 
         console.log(nodeID.padEnd(NODE_FIELD_CHAR," ").substr(0,NODE_FIELD_CHAR),
                     entry.nodeIP.padEnd(IP_FIELD_CHAR," ").substr(0,IP_FIELD_CHAR),
+                    entry.bgpPrefix.padEnd(IP_FIELD_CHAR," ").substr(0,IP_FIELD_CHAR),
+                    entry.asnID.padEnd(ASNID_FIELD_CHAR," ").substr(0,ASNID_FIELD_CHAR),
                     entry.asn.padEnd(ASN_FIELD_CHAR," ").substr(0,ASN_FIELD_CHAR),
                     entry.count)
       })
