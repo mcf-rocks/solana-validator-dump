@@ -126,11 +126,13 @@ async function main() {
     }
     if ( response.ok ) {
 
-      const asn = response.out
+      const [asnID,,bgpPrefix,,,,asn] = response.out.split("|").map(s => s.trim())
 
-      ++summary[asn] || (summary[asn]=1)
+      const sumStr = asn+" ("+asnID+")"
 
-      nodesGrouped[response.nodeID] = { nodeIP: response.nodeIP, asn } 
+      ++summary[sumStr] || (summary[sumStr]=1)
+
+      nodesGrouped[response.nodeID] = { nodeIP: response.nodeIP, asn, asnID, bgpPrefix } 
     }
   }
   
@@ -222,7 +224,8 @@ function ascItemDo( hash, func ) {
 } 
   
 function execQuery(nodeID, nodeIP) {
-  const cmd = 'whois -h bgp.tools " -v '+nodeIP+'" | tail -1 | cut -d"|" -f7'
+  //const cmd = 'whois -h bgp.tools " -v '+nodeIP+'" | tail -1 | cut -d"|" -f7'
+  const cmd = 'whois -h bgp.tools " -v '+nodeIP+'" | tail -1 '
   const exec = require('child_process').exec
   return new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
